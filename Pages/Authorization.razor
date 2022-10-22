@@ -1,0 +1,47 @@
+﻿
+@page "/counter"
+
+<PageTitle>Authorization</PageTitle>
+
+@using ControlWorkBlazor.Data
+@inject IJSRuntime JsRuntime
+
+
+<h1>Authorization</h1>
+
+<EditForm Model="user">
+    <p>Enter your login</p>
+    <InputText @bind-Value="@user.Login" @onchange="@((ChangeEventArgs e) => user.Login = e.Value.ToString())" />
+    <p>Enter your password</p>
+    <InputText @bind-Value="@user.Password" @onchange="@((ChangeEventArgs e) => user.Login = e.Value.ToString())" />
+        <button type="submit" @onclick="() => FindUser()">Authorize</button>
+</EditForm>
+
+@code {
+    User user = new User();
+
+    public async void FindUser()
+    {
+        User currentUser;
+        currentUser = MongoConnection.FindByLogin(user.Login);
+
+        if (currentUser is null)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Invalid user");
+            return;
+        }
+        else
+        {
+            if(currentUser.Password == user.Password)
+            {
+                MongoConnection.currUser = MongoConnection.FindByLogin(user.Login);
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Invaild password!");
+            }
+        }
+        user = new User();
+
+    }
+}

@@ -1,0 +1,43 @@
+﻿@page "/registration"
+
+<PageTitle>Registration</PageTitle>
+
+@using ControlWorkBlazor.Data
+@inject IJSRuntime JsRuntime
+
+
+
+<h1>Please, enter your data</h1>
+<EditForm Model="user">
+<p>Enter your name:</p>
+<InputText @bind-Value="@user.Name" @onchange="@((ChangeEventArgs e) => user.Name = e.Value.ToString())" />
+<p>Enter your surname:</p>
+<InputText @bind-Value="@user.Surname" @onchange="@((ChangeEventArgs e) => user.Surname = e.Value.ToString())" />
+<p>Enter your email:</p>
+<InputText @bind-Value="@user.Email" @onchange="@((ChangeEventArgs e) => user.Email = e.Value.ToString())" />
+<p>Enter your login:</p>
+<InputText @bind-Value="@user.Login" @onchange="@((ChangeEventArgs e) => user.Login = e.Value.ToString())" />
+<p>Enter your password:</p>
+<InputText @bind-Value="@user.Password" @onchange="@((ChangeEventArgs e) => user.Password = e.Value.ToString())" />
+<p>Enter your passwrod again:</p>
+<InputText @bind-Value="@user.RePassword" @onchange="@((ChangeEventArgs e) => user.RePassword = e.Value.ToString())" />
+
+<button type="submit" @onclick="@AddToDb">Register</button>
+</EditForm>
+
+@code {
+    User user = new User();
+    private bool resultOfPass;
+
+    public async void AddToDb()
+    {
+        if (user.Password.Equals(user.RePassword) == true)
+        {
+            MongoConnection.AddToDataBase(user);
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Passwords is different");
+        }
+    }
+}
